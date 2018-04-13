@@ -1,4 +1,5 @@
 #!/bin/bash
+SAMPLE="WOLF";
 GET_GOOSE=1;
 GET_FALCON=1;
 GET_WOLF=1;
@@ -37,12 +38,15 @@ fi
 #==============================================================================
 # FILTER_TRIM
 if [[ "$FILTER_TRIM" -eq "1" ]]; then
+  ./goose-FastqInfo <(zcat wolf.fq.gz) 
   echo "void";
+
 fi
 #==============================================================================
 # RUN FALCON
 if [[ "$RUN_FALCON" -eq "1" ]]; then
-  echo "void";
+  (time ./FALCON -v -n 8 -t 200 -F -Z -c 250 -y complexity-$SAMPLE.txt reads_$SAMPLE.fq DB.fa ) &> REPORT-FALCON-$SAMPLE ;
+  (time ./FALCON-FILTER -v -F -sl 0.001 -du 20000000 -t 0.5 -o positions-$SAMPLE.txt complexity-$SAMPLE.txt ) &> REPORT-FALCON-$SAMPLE ;
+  (time ./FALCON-EYE -v -F -e 500 -s 4 -sl 3 -o FALCON-$SAMPLE.svg positions-$SAMPLE.txt ) &> REPORT-FALCON-EYE-$SAMPLE ;
 fi
 #==============================================================================
-
